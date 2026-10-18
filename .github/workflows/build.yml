@@ -5,19 +5,34 @@ on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-22.04
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-      - run: |
+
+      - name: Install System Dependencies
+        run: |
           sudo apt-get update
           sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+
+      - name: Install Buildozer & Cython
+        run: |
           pip install --upgrade pip
           pip install cython==0.29.37 buildozer
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          buildozer -v android debug
-      - uses: actions/upload-artifact@v4
+
+      - name: Build APK with Buildozer
+        run: |
+          yes | buildozer -v android debug
+        env:
+          ACCEPT_BUILD_TOOLS_CHECKSUM: "true"
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
         with:
           name: UtilityApp-APK
           path: bin/*.apk
