@@ -16,8 +16,7 @@ jobs:
           pip install --upgrade pip
           pip install cython==0.29.37 buildozer
           buildozer -v android debug
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: UtilityApp-APK
           path: bin/*.apk
-          
